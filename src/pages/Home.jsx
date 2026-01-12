@@ -6,7 +6,9 @@ export default function Home() {
   return (
     <div className="center home-hero">
       <div className="home-panel">
-        <span className="home-eyebrow">Client preview · OTP‑gated live access</span>
+        <span className="home-eyebrow">
+          Client preview · OTP‑gated live access
+        </span>
 
         <h1 className="home-title">
           Private &amp; secure
@@ -15,8 +17,9 @@ export default function Home() {
         </h1>
 
         <p className="home-subtitle">
-          Share a single link, verify viewers by email + one‑time passcode, and guide
-          them into a premium live experience that feels built just for them.
+          Share a single link, verify viewers by email + one‑time passcode, and
+          guide them into a premium live experience that feels built just for
+          them.
         </p>
 
         <div className="home-cta-row">
@@ -27,7 +30,9 @@ export default function Home() {
 
         <div className="home-meta-row">
           <span className="home-highlight">No passwords, no friction.</span>
-          <span className="home-caption">Viewer entries are fully OTP verified.</span>
+          <span className="home-caption">
+            Viewer entries are fully OTP verified.
+          </span>
         </div>
       </div>
     </div>
