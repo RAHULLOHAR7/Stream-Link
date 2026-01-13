@@ -50,17 +50,32 @@ exports.sendOtp = async (req, res) => {
 /* ===============================
    🔹 GET ALL USERS WITH OTP
 ================================ */
-exports.getAllOtpUsers = async (req, res) => {
+// exports.getAllOtpUsers = async (req, res) => {
+//   try {
+//     const users = await User.find({
+//       $or: [
+//         { otp: { $exists: true, $ne: null } },
+//         { otpExpiry: { $exists: true, $ne: null } }
+//       ]
+//     }).select('email otp otpExpiry verified createdAt updatedAt');
+
+//     res.json({
+//       message: "Users with OTP retrieved successfully",
+//       count: users.length,
+//       users
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Failed to retrieve users" });
+//   }
+// };
+
+exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({
-      $or: [
-        { otp: { $exists: true, $ne: null } },
-        { otpExpiry: { $exists: true, $ne: null } }
-      ]
-    }).select('email otp otpExpiry verified createdAt updatedAt');
+    const users = await User.find({}).sort({ createdAt: -1 }); // Get all users, newest first
 
     res.json({
-      message: "Users with OTP retrieved successfully",
+      message: "All users retrieved successfully",
       count: users.length,
       users
     });

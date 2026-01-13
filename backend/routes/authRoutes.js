@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { sendOtp, verifyOtp, getAllOtpUsers } = require("../controllers/authController");
+const { sendOtp, verifyOtp, getAllUsers } = require("../controllers/authController");
 
 router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtp);
-router.get("/users", getAllOtpUsers);
+router.get("/users", getAllUsers);
 
 module.exports = router;
