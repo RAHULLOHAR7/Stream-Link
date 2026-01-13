@@ -48,6 +48,29 @@ exports.sendOtp = async (req, res) => {
 };
 
 /* ===============================
+   🔹 GET ALL USERS WITH OTP
+================================ */
+exports.getAllOtpUsers = async (req, res) => {
+  try {
+    const users = await User.find({
+      $or: [
+        { otp: { $exists: true, $ne: null } },
+        { otpExpiry: { $exists: true, $ne: null } }
+      ]
+    }).select('email otp otpExpiry verified createdAt updatedAt');
+
+    res.json({
+      message: "Users with OTP retrieved successfully",
+      count: users.length,
+      users
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to retrieve users" });
+  }
+};
+
+/* ===============================
    🔹 VERIFY OTP
 ================================ */
 exports.verifyOtp = async (req, res) => {
