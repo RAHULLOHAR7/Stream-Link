@@ -84,6 +84,7 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve users" });
   }
 };
+//get all users data here 
 
 /* ===============================
    🔹 VERIFY OTP
