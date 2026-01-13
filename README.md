@@ -1,4 +1,4 @@
-# 🎥 Private Live Streaming Access Platform (UI Demo)
+# 🎥 Private Live Streaming Access Platform
 
 A modern, premium **React-based UI demo** for a private live streaming access system.  
 This project is designed to give a **real product feel** for clients who want to share live stream links securely using email verification.
@@ -48,9 +48,7 @@ Copy code
 ## 🚀 Live Demo
 
 👉 **Live URL:**  
-(Add your Netlify URL here after deployment)
 
-https://your-project-name.netlify.app
 
 yaml
 Copy code
