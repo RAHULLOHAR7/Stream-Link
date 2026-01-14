@@ -17,6 +17,12 @@ exports.sendOtp = async (req, res) => {
     // ✅ NORMALIZE EMAIL
     email = email.toLowerCase().trim();
 
+    // ✅ VALIDATE EMAIL FORMAT
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = Date.now() + 5 * 60 * 1000; // 5 minutes
 
@@ -31,19 +37,54 @@ exports.sendOtp = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    await transporter.sendMail({
-      to: email,
-      subject: "Your OTP for Live Stream Access",
-      html: `
-        <h2>Your OTP is <b>${otp}</b></h2>
-        <p>This code is valid for 5 minutes.</p>
-      `,
-    });
+    // ✅ SEND EMAIL WITH PROPER ERROR HANDLING
+    try {
+      const mailInfo = await transporter.sendMail({
+        from: process.env.EMAIL, // Explicitly set from address
+        to: email,
+        subject: "Your OTP for Live Stream Access",
+        html: `
+          <h2>Your OTP is <b>${otp}</b></h2>
+          <p>This code is valid for 5 minutes.</p>
+        `,
+      });
 
-    res.json({ message: "OTP sent successfully" });
+      console.log(`✅ OTP email sent successfully to: ${email}`, mailInfo.messageId);
+      res.json({ message: "OTP sent successfully" });
+    } catch (mailError) {
+      // Log detailed email error
+      console.error(`❌ Email sending failed for: ${email}`, {
+        error: mailError.message,
+        code: mailError.code,
+        response: mailError.response,
+        responseCode: mailError.responseCode,
+        command: mailError.command,
+      });
+
+      // Return more specific error message
+      if (mailError.code === 'EAUTH' || mailError.code === 'EENVELOPE') {
+        return res.status(500).json({ 
+          message: "Email authentication failed. Please check email configuration.",
+          error: mailError.message 
+        });
+      } else if (mailError.code === 'ECONNECTION' || mailError.code === 'ETIMEDOUT') {
+        return res.status(500).json({ 
+          message: "Email service connection failed. Please try again later.",
+          error: mailError.message 
+        });
+      } else {
+        return res.status(500).json({ 
+          message: `Failed to send OTP email to ${email}. Please check if the email address is valid.`,
+          error: mailError.message 
+        });
+      }
+    }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "OTP send failed" });
+    console.error("❌ OTP send error:", err);
+    res.status(500).json({ 
+      message: "OTP send failed", 
+      error: err.message 
+    });
   }
 };
 
