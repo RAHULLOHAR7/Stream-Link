@@ -179,3 +179,64 @@ exports.verifyOtp = async (req, res) => {
     res.status(500).json({ message: "OTP verification failed" });
   }
 };
+
+/* ===============================
+   🔹 DIRECT LOGIN (NO OTP)
+================================ */
+exports.directLogin = async (req, res) => {
+  try {
+    let { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // ✅ NORMALIZE EMAIL
+    email = email.toLowerCase().trim();
+
+    // ✅ VALIDATE EMAIL FORMAT
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // ✅ CREATE OR UPDATE USER (NO OTP REQUIRED)
+    const user = await User.findOneAndUpdate(
+      { email },
+      {
+        email, // ensure lowercase stored
+        verified: true, // Direct access, no verification needed
+        otp: null,
+        otpExpiry: null,
+      },
+      { upsert: true, new: true }
+    );
+
+    // 🔐 JWT TOKEN
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" } // Longer expiry for direct login
+    );
+
+    // 🧾 LOGIN LOG
+    await LoginLog.create({
+      email: user.email,
+      ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+      userAgent: req.headers["user-agent"],
+    });
+
+    console.log(`✅ Direct login successful for: ${email}`);
+
+    res.json({
+      message: "Access granted",
+      token,
+    });
+  } catch (err) {
+    console.error("❌ Direct login error:", err);
+    res.status(500).json({ 
+      message: "Login failed", 
+      error: err.message 
+    });
+  }
+};
